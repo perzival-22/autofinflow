@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { Chart, ArcElement, Tooltip, Legend } from 'chart.js'
+import { Chart, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js'
 import DB from '../js/data'
 
-Chart.register(ArcElement, Tooltip, Legend)
+Chart.register(DoughnutController, ArcElement, Tooltip, Legend)
 
 const COLORS = ['#1a56db','#10b981','#f59e0b','#ef4444','#8b5cf6','#0ea5e9','#ec4899','#14b8a6']
 
@@ -52,11 +52,13 @@ export default function Reports() {
     const labels = Object.keys(data.incMap).map(k=>k.charAt(0).toUpperCase()+k.slice(1))
     const vals   = Object.values(data.incMap)
     if (vals.length) {
-      incomeChart.current = new Chart(incomeRef.current, {
-        type:'doughnut',
-        data:{ labels, datasets:[{ data:vals, backgroundColor:COLORS.slice(0,vals.length), borderWidth:2, borderColor:'#fff' }] },
-        options:{ responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{ legend:{position:'right',labels:{font:{size:12},padding:12}}, tooltip:{callbacks:{label:ctx=>` KES ${Number(ctx.raw).toLocaleString()}`}} } }
-      })
+      try {
+        incomeChart.current = new Chart(incomeRef.current, {
+          type:'doughnut',
+          data:{ labels, datasets:[{ data:vals, backgroundColor:COLORS.slice(0,vals.length), borderWidth:2, borderColor:'#fff' }] },
+          options:{ responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{ legend:{position:'right',labels:{font:{size:12},padding:12}}, tooltip:{callbacks:{label:ctx=>` KES ${Number(ctx.raw).toLocaleString()}`}} } }
+        })
+      } catch(e) { console.error('Income chart error:', e) }
     } else {
       const ctx = incomeRef.current.getContext('2d'); ctx.clearRect(0,0,9999,9999)
       ctx.fillStyle='#94a3b8'; ctx.font='14px Segoe UI'; ctx.textAlign='center'; ctx.fillText('No data for this period',160,120)
@@ -70,11 +72,13 @@ export default function Reports() {
     const labels = Object.keys(data.expMap).map(k=>k.charAt(0).toUpperCase()+k.slice(1))
     const vals   = Object.values(data.expMap)
     if (vals.length) {
-      expenseChart.current = new Chart(expenseRef.current, {
-        type:'doughnut',
-        data:{ labels, datasets:[{ data:vals, backgroundColor:COLORS.slice(0,vals.length), borderWidth:2, borderColor:'#fff' }] },
-        options:{ responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{ legend:{position:'right',labels:{font:{size:12},padding:12}}, tooltip:{callbacks:{label:ctx=>` KES ${Number(ctx.raw).toLocaleString()}`}} } }
-      })
+      try {
+        expenseChart.current = new Chart(expenseRef.current, {
+          type:'doughnut',
+          data:{ labels, datasets:[{ data:vals, backgroundColor:COLORS.slice(0,vals.length), borderWidth:2, borderColor:'#fff' }] },
+          options:{ responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{ legend:{position:'right',labels:{font:{size:12},padding:12}}, tooltip:{callbacks:{label:ctx=>` KES ${Number(ctx.raw).toLocaleString()}`}} } }
+        })
+      } catch(e) { console.error('Expense chart error:', e) }
     } else {
       const ctx = expenseRef.current.getContext('2d'); ctx.clearRect(0,0,9999,9999)
       ctx.fillStyle='#94a3b8'; ctx.font='14px Segoe UI'; ctx.textAlign='center'; ctx.fillText('No data for this period',160,120)

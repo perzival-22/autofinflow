@@ -1,12 +1,22 @@
 import { useState, useEffect, useRef } from 'react'
-import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js'
+import { Chart, LineController, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js'
 import DB from '../js/data'
 
-Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
+Chart.register(LineController, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
 
 export default function Forecast() {
   const [days, setDays] = useState(90)
-  const [data, setData] = useState(null)
+  const [data, setData] = useState(() => {
+    const pays = DB.getPayments()
+    const curBal = pays.filter(p=>p.type==='income').reduce((s,p)=>s+Number(p.amount),0)
+                 - pays.filter(p=>p.type==='expense').reduce((s,p)=>s+Number(p.amount),0)
+    const events = DB.getForecast(90)
+    const expectedIn  = events.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0)
+    const expectedOut = events.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0)
+    const endBal = events.length ? events[events.length-1].runningBalance : curBal
+    const endDate = new Date(); endDate.setDate(endDate.getDate()+90)
+    return { curBal, events, expectedIn, expectedOut, endBal, endDate }
+  })
   const canvasRef = useRef(null)
   const chartRef  = useRef(null)
 
@@ -39,7 +49,7 @@ export default function Forecast() {
       balances.push(running)
     }
 
-    chartRef.current = new Chart(canvasRef.current, {
+    try { chartRef.current = new Chart(canvasRef.current, {
       type: 'line',
       data: { labels, datasets: [{ label:'Projected Balance', data:balances, borderColor:'#1a56db', backgroundColor:'rgba(16,185,129,0.08)', borderWidth:2.5, pointRadius:4, pointBackgroundColor:balances.map(b=>b>=0?'#10b981':'#ef4444'), tension:0.35, fill:true }] },
       options: {
@@ -48,7 +58,7 @@ export default function Forecast() {
         plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+DB.fmt(ctx.raw)}} },
         scales:{ x:{grid:{display:false}}, y:{ticks:{callback:v=>DB.getSettings().currency+' '+(v/1000).toFixed(0)+'k'},grid:{color:'#f1f5f9'}} }
       }
-    })
+    }) } catch(e) { console.error('Forecast chart error:', e) }
     return () => { chartRef.current?.destroy(); chartRef.current=null }
   }, [data])
 

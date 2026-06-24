@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Chart, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend } from 'chart.js'
+import { Chart, BarController, DoughnutController, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend } from 'chart.js'
 import DB from '../js/data'
 
-Chart.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend)
+Chart.register(BarController, DoughnutController, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend)
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const [stats, setStats] = useState(null)
-  const [payments, setPayments] = useState([])
-  const [invoices, setInvoices] = useState([])
+  const [stats, setStats] = useState(() => DB.getStats())
+  const [payments, setPayments] = useState(() => DB.getPayments().slice(0, 8))
+  const [invoices, setInvoices] = useState(() => DB.getInvoices().slice(0, 6))
   const barRef = useRef(null)
   const pieRef = useRef(null)
   const barChart = useRef(null)
@@ -22,7 +22,7 @@ export default function Dashboard() {
   }, [])
 
   useEffect(() => {
-    if (!stats || !barRef.current) return
+    if (!barRef.current) return
     if (barChart.current) barChart.current.destroy()
     const allPay = DB.getPayments()
     const now = new Date()
@@ -35,34 +35,37 @@ export default function Dashboard() {
       income.push(f.filter(p=>p.type==='income').reduce((s,p)=>s+Number(p.amount),0))
       expense.push(f.filter(p=>p.type==='expense').reduce((s,p)=>s+Number(p.amount),0))
     }
-    barChart.current = new Chart(barRef.current, {
-      type: 'bar',
-      data: { labels: months, datasets: [
-        { label: 'Income',   data: income,  backgroundColor: 'rgba(16,185,129,0.75)', borderRadius: 5 },
-        { label: 'Expenses', data: expense, backgroundColor: 'rgba(239,68,68,0.65)',  borderRadius: 5 }
-      ]},
-      options: { responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'top', labels: { font: { size: 12 } } } },
-        scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { callback: v => 'KES '+(v/1000).toFixed(0)+'k' } } }
-      }
-    })
+    try {
+      barChart.current = new Chart(barRef.current, {
+        type: 'bar',
+        data: { labels: months, datasets: [
+          { label: 'Income',   data: income,  backgroundColor: 'rgba(16,185,129,0.75)', borderRadius: 5 },
+          { label: 'Expenses', data: expense, backgroundColor: 'rgba(239,68,68,0.65)',  borderRadius: 5 }
+        ]},
+        options: { responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'top', labels: { font: { size: 12 } } } },
+          scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { callback: v => 'KES '+(v/1000).toFixed(0)+'k' } } }
+        }
+      })
+    } catch(e) { console.error('Bar chart error:', e) }
     return () => { barChart.current?.destroy(); barChart.current = null }
   }, [stats])
 
   useEffect(() => {
-    if (!stats || !pieRef.current) return
+    if (!pieRef.current) return
     if (pieChart.current) pieChart.current.destroy()
-    pieChart.current = new Chart(pieRef.current, {
-      type: 'doughnut',
-      data: { labels: ['Income','Expenses'], datasets: [{ data: [stats.totalIncome||1, stats.totalExpense||1], backgroundColor: ['rgba(16,185,129,0.8)','rgba(239,68,68,0.75)'], borderWidth:2, borderColor:'#fff' }] },
-      options: { responsive: true, maintainAspectRatio: false, cutout: '65%',
-        plugins: { legend: { position:'bottom', labels:{ font:{size:13}, padding:16 } }, tooltip:{ callbacks:{ label: ctx => ' KES '+Number(ctx.raw).toLocaleString() } } }
-      }
-    })
+    try {
+      pieChart.current = new Chart(pieRef.current, {
+        type: 'doughnut',
+        data: { labels: ['Income','Expenses'], datasets: [{ data: [stats.totalIncome||1, stats.totalExpense||1], backgroundColor: ['rgba(16,185,129,0.8)','rgba(239,68,68,0.75)'], borderWidth:2, borderColor:'#fff' }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '65%',
+          plugins: { legend: { position:'bottom', labels:{ font:{size:13}, padding:16 } }, tooltip:{ callbacks:{ label: ctx => ' KES '+Number(ctx.raw).toLocaleString() } } }
+        }
+      })
+    } catch(e) { console.error('Pie chart error:', e) }
     return () => { pieChart.current?.destroy(); pieChart.current = null }
   }, [stats])
 
-  if (!stats) return null
   const date = new Date().toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'long', year:'numeric' })
 
   return (
