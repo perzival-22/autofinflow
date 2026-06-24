@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clients | AutoFinFlow</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">A</div>
+    <div class="logo-text">Auto<span>Fin</span>Flow</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">Main</span>
+    <a href="index.html"    class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <a href="payments.html"  class="nav-item"><span class="nav-icon">💳</span> Payments</a>
+    <a href="recurring.html" class="nav-item"><span class="nav-icon">🔁</span> Recurring</a>
+    <a href="reports.html"   class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+    <a href="forecast.html" class="nav-item"><span class="nav-icon">🔮</span> Forecast</a>
+    <span class="nav-section-label">Business</span>
+    <a href="clients.html"  class="nav-item active"><span class="nav-icon">👥</span> Clients</a>
+    <span class="nav-section-label">System</span>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><div class="version">AutoFinFlow v2.0</div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Clients</h1>
+      <p>Manage your business relationships</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="openModal()">+ Add Client</button>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <div class="filter-bar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search clients…" oninput="renderTable()" />
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Clients</span>
+        <span id="clientCount" style="font-size:13px;color:var(--text-muted)"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Client Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Total Billed</th>
+              <th>Total Paid</th>
+              <th>Outstanding</th>
+              <th>Invoices</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="clientTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Client Modal -->
+<div class="modal-overlay" id="clientModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Add Client</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="clientId" />
+      <div class="form-group">
+        <label class="form-label">Client / Company Name *</label>
+        <input class="form-control" id="clientName" placeholder="e.g. Safaricom Ltd" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-control" id="clientEmail" type="email" placeholder="billing@company.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input class="form-control" id="clientPhone" placeholder="+254 7XX XXX XXX" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <input class="form-control" id="clientAddress" placeholder="Street, City, Country" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-control" id="clientNotes" placeholder="Payment terms, contact person, etc."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/data.js"></script>
+<script src="js/clients.js"></script>
+</body>
+</html>

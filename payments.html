@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payments | AutoFinFlow</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">A</div>
+    <div class="logo-text">Auto<span>Fin</span>Flow</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">Main</span>
+    <a href="index.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <a href="payments.html"  class="nav-item active"><span class="nav-icon">💳</span> Payments</a>
+    <a href="recurring.html" class="nav-item"><span class="nav-icon">🔁</span> Recurring</a>
+    <a href="reports.html"   class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+    <a href="forecast.html" class="nav-item"><span class="nav-icon">🔮</span> Forecast</a>
+    <span class="nav-section-label">Business</span>
+    <a href="clients.html" class="nav-item"><span class="nav-icon">👥</span> Clients</a>
+    <span class="nav-section-label">System</span>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><div class="version">AutoFinFlow v2.0</div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Payments</h1>
+      <p>Track income and expenses</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇️ CSV</button>
+      <button class="btn btn-primary" onclick="openModal()">+ Record Payment</button>
+    </div>
+  </header>
+
+  <div class="page-body">
+
+    <!-- Summary KPIs -->
+    <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); margin-bottom:24px;">
+      <div class="kpi-card">
+        <div class="kpi-icon green">📥</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Total Income</div>
+          <div class="kpi-value" id="sumIncome">—</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon red">📤</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Total Expenses</div>
+          <div class="kpi-value" id="sumExpense">—</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon blue">💰</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Net Balance</div>
+          <div class="kpi-value" id="sumNet">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search by description, client…" oninput="renderTable()" />
+      <select class="filter-select" id="typeFilter" onchange="renderTable()">
+        <option value="">All Types</option>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+      <select class="filter-select" id="methodFilter" onchange="renderTable()">
+        <option value="">All Methods</option>
+        <option value="bank_transfer">Bank Transfer</option>
+        <option value="mpesa">M-Pesa</option>
+        <option value="cash">Cash</option>
+        <option value="card">Card</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Transaction History</span>
+        <span id="payCount" style="font-size:13px;color:var(--text-muted)"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Client / Party</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Method</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Recur</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="payTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Record Payment</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="payId" />
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-control" id="payType">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input class="form-control" type="date" id="payDate" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Client / Party</label>
+        <input class="form-control" id="payClient" placeholder="e.g. Safaricom Ltd (or leave blank for expense)" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Amount (KES)</label>
+          <input class="form-control" type="number" id="payAmount" placeholder="0.00" min="0" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Method</label>
+          <select class="form-control" id="payMethod">
+            <option value="bank_transfer">Bank Transfer</option>
+            <option value="mpesa">M-Pesa</option>
+            <option value="cash">Cash</option>
+            <option value="card">Card</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-control" id="payCategory">
+            <option value="services">Services</option>
+            <option value="salaries">Salaries</option>
+            <option value="rent">Rent</option>
+            <option value="utilities">Utilities</option>
+            <option value="supplies">Supplies</option>
+            <option value="transport">Transport</option>
+            <option value="marketing">Marketing</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-control" id="payNotes" placeholder="Description, invoice reference, etc."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="savePayment()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/data.js"></script>
+<script src="js/payments.js"></script>
+</body>
+</html>

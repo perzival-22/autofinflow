@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoices | AutoFinFlow</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">A</div>
+    <div class="logo-text">Auto<span>Fin</span>Flow</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">Main</span>
+    <a href="index.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="invoices.html" class="nav-item active"><span class="nav-icon">🧾</span> Invoices</a>
+    <a href="payments.html"  class="nav-item"><span class="nav-icon">💳</span> Payments</a>
+    <a href="recurring.html" class="nav-item"><span class="nav-icon">🔁</span> Recurring</a>
+    <a href="reports.html"   class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+    <a href="forecast.html" class="nav-item"><span class="nav-icon">🔮</span> Forecast</a>
+    <span class="nav-section-label">Business</span>
+    <a href="clients.html" class="nav-item"><span class="nav-icon">👥</span> Clients</a>
+    <span class="nav-section-label">System</span>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><div class="version">AutoFinFlow v2.0</div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Invoices</h1>
+      <p>Create and manage your business invoices</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇️ CSV</button>
+      <button class="btn btn-primary" onclick="openModal()">+ New Invoice</button>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <div class="filter-bar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search by client or invoice number…" oninput="renderTable()" />
+      <select class="filter-select" id="statusFilter" onchange="renderTable()">
+        <option value="">All Statuses</option>
+        <option value="draft">Draft</option>
+        <option value="pending">Pending</option>
+        <option value="paid">Paid</option>
+        <option value="overdue">Overdue</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Invoices</span>
+        <span id="invoiceCount" style="font-size:13px;color:var(--text-muted)"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Client</th>
+              <th>Date</th>
+              <th>Due Date</th>
+              <th>Subtotal</th>
+              <th>VAT</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="invoiceTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Invoice Modal -->
+<div class="modal-overlay" id="invoiceModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">New Invoice</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="invId" />
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Invoice Number</label>
+          <input class="form-control" id="invNumber" placeholder="INV-001" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="invStatus">
+            <option value="draft">Draft</option>
+            <option value="pending" selected>Pending</option>
+            <option value="paid">Paid</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Client Name</label>
+        <input class="form-control" id="invClient" placeholder="e.g. Safaricom Ltd" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Invoice Date</label>
+          <input class="form-control" type="date" id="invDate" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Due Date</label>
+          <input class="form-control" type="date" id="invDue" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Subtotal (before VAT)</label>
+          <input class="form-control" type="number" id="invSubtotal" placeholder="0.00" min="0" step="0.01" oninput="calcVAT()" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">VAT Rate (%)</label>
+          <input class="form-control" type="number" id="invVatRate" placeholder="16" min="0" max="100" step="0.1" oninput="calcVAT()" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">VAT Amount</label>
+          <input class="form-control" id="invVatAmt" readonly style="background:#f8fafc;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Total Amount</label>
+          <input class="form-control" id="invAmount" readonly style="background:#f8fafc;font-weight:700;" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description / Notes</label>
+        <textarea class="form-control" id="invNotes" placeholder="Services rendered, project description…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInvoice()">Save Invoice</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/data.js"></script>
+<script src="js/invoices.js"></script>
+</body>
+</html>

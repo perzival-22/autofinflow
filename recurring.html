@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recurring | AutoFinFlow</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">A</div>
+    <div class="logo-text">Auto<span>Fin</span>Flow</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">Main</span>
+    <a href="index.html"    class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <a href="payments.html" class="nav-item"><span class="nav-icon">💳</span> Payments</a>
+    <a href="recurring.html" class="nav-item active"><span class="nav-icon">🔁</span> Recurring</a>
+    <a href="reports.html"  class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+    <a href="forecast.html" class="nav-item"><span class="nav-icon">🔮</span> Forecast</a>
+    <span class="nav-section-label">Business</span>
+    <a href="clients.html"  class="nav-item"><span class="nav-icon">👥</span> Clients</a>
+    <span class="nav-section-label">System</span>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><div class="version">AutoFinFlow v2.0</div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Recurring Transactions</h1>
+      <p>Auto-logged income and expenses on a schedule</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="openModal()">+ New Recurring</button>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <div class="card" style="margin-bottom:16px;padding:14px 20px;display:flex;align-items:center;gap:10px;background:#ede9fe;border-color:#ddd6fe;">
+      <span style="font-size:20px;">🔁</span>
+      <span style="font-size:14px;color:#4c1d95;">Recurring transactions auto-log when their due date arrives. Open the Payments page or refresh to trigger auto-logging.</span>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Active Schedules</span>
+        <span id="recurCount" style="font-size:13px;color:var(--text-muted)"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Frequency</th>
+              <th>Category</th>
+              <th>Method</th>
+              <th>Last Run</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recurTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recurring Modal -->
+<div class="modal-overlay" id="recurModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">New Recurring Transaction</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="recurId" />
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-control" id="rType">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Frequency</label>
+          <select class="form-control" id="rFreq">
+            <option value="weekly">Weekly</option>
+            <option value="monthly" selected>Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Client / Party (optional)</label>
+        <input class="form-control" id="rClient" placeholder="e.g. Twiga Foods (leave blank for expenses)" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Amount (KES)</label>
+          <input class="form-control" type="number" id="rAmount" placeholder="0.00" min="0" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Method</label>
+          <select class="form-control" id="rMethod">
+            <option value="bank_transfer">Bank Transfer</option>
+            <option value="mpesa">M-Pesa</option>
+            <option value="cash">Cash</option>
+            <option value="card">Card</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-control" id="rCategory">
+            <option value="services">Services</option>
+            <option value="salaries">Salaries</option>
+            <option value="rent">Rent</option>
+            <option value="utilities">Utilities</option>
+            <option value="supplies">Supplies</option>
+            <option value="transport">Transport</option>
+            <option value="marketing">Marketing</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input class="form-control" type="date" id="rStart" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description / Notes</label>
+        <textarea class="form-control" id="rNotes" placeholder="e.g. Office rent — 5th floor"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRecurring()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/data.js"></script>
+<script src="js/recurring.js"></script>
+</body>
+</html>

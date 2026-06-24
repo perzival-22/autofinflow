@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forecast | AutoFinFlow</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">A</div>
+    <div class="logo-text">Auto<span>Fin</span>Flow</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">Main</span>
+    <a href="index.html"     class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="invoices.html"  class="nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <a href="payments.html"  class="nav-item"><span class="nav-icon">💳</span> Payments</a>
+    <a href="recurring.html" class="nav-item"><span class="nav-icon">🔁</span> Recurring</a>
+    <a href="reports.html"   class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+    <a href="forecast.html"  class="nav-item active"><span class="nav-icon">🔮</span> Forecast</a>
+    <span class="nav-section-label">Business</span>
+    <a href="clients.html"   class="nav-item"><span class="nav-icon">👥</span> Clients</a>
+    <span class="nav-section-label">System</span>
+    <a href="settings.html"  class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><div class="version">AutoFinFlow v2.0</div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Cash Flow Forecast</h1>
+      <p>Projected balance based on pending invoices and recurring transactions</p>
+    </div>
+    <div class="topbar-right">
+      <select class="filter-select" id="horizonFilter" onchange="renderForecast()">
+        <option value="30">Next 30 days</option>
+        <option value="60">Next 60 days</option>
+        <option value="90" selected>Next 90 days</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="page-body">
+
+    <!-- Summary -->
+    <div class="kpi-grid" style="margin-bottom:24px;">
+      <div class="kpi-card">
+        <div class="kpi-icon blue">🏦</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Current Balance</div>
+          <div class="kpi-value" id="fcCurrentBal">—</div>
+          <div class="kpi-sub">All recorded transactions</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon green">📥</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Expected Income</div>
+          <div class="kpi-value" id="fcExpectedIn">—</div>
+          <div class="kpi-sub" id="fcHorizonSub">Next 90 days</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon red">📤</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Expected Expenses</div>
+          <div class="kpi-value" id="fcExpectedOut">—</div>
+          <div class="kpi-sub" id="fcHorizonSub2">Next 90 days</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon amber">🔮</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Projected End Balance</div>
+          <div class="kpi-value" id="fcEndBal">—</div>
+          <div class="kpi-sub" id="fcEndDate">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Running Balance Chart -->
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-header"><span class="card-title">Running Balance Projection</span></div>
+      <div class="card-body">
+        <div class="chart-container" style="height:280px;"><canvas id="forecastChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Forecast Table -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Upcoming Events</span>
+        <span id="fcEventCount" style="font-size:13px;color:var(--text-muted)"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th><th>Running Balance</th></tr>
+          </thead>
+          <tbody id="forecastTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/data.js"></script>
+<script src="js/forecast.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports | AutoFinFlow</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">A</div>
+    <div class="logo-text">Auto<span>Fin</span>Flow</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">Main</span>
+    <a href="index.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <a href="payments.html"  class="nav-item"><span class="nav-icon">💳</span> Payments</a>
+    <a href="recurring.html" class="nav-item"><span class="nav-icon">🔁</span> Recurring</a>
+    <a href="reports.html"   class="nav-item active"><span class="nav-icon">📈</span> Reports</a>
+    <a href="forecast.html" class="nav-item"><span class="nav-icon">🔮</span> Forecast</a>
+    <span class="nav-section-label">Business</span>
+    <a href="clients.html" class="nav-item"><span class="nav-icon">👥</span> Clients</a>
+    <span class="nav-section-label">System</span>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><div class="version">AutoFinFlow v2.0</div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Reports</h1>
+      <p>Cash flow analysis and financial summaries</p>
+    </div>
+    <div class="topbar-right">
+      <select class="filter-select" id="monthFilter" onchange="renderAll()"></select>
+    </div>
+  </header>
+
+  <div class="page-body">
+
+    <!-- Monthly Summary Cards -->
+    <div class="kpi-grid" style="margin-bottom:24px;">
+      <div class="kpi-card">
+        <div class="kpi-icon green">💰</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Monthly Income</div>
+          <div class="kpi-value" id="rptIncome">—</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon red">💸</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Monthly Expenses</div>
+          <div class="kpi-value" id="rptExpense">—</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon blue">🏦</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Net Cash Flow</div>
+          <div class="kpi-value" id="rptNet">—</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon amber">📋</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Invoices Issued</div>
+          <div class="kpi-value" id="rptInvCount">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid-2" style="margin-bottom:24px;">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Income by Category</span></div>
+        <div class="card-body">
+          <div class="chart-container"><canvas id="incomeChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Expense Breakdown</span></div>
+        <div class="card-body">
+          <div class="chart-container"><canvas id="expenseChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overdue Invoices + Top Clients -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚠️ Overdue Invoices</span>
+          <span id="overdueCount" style="font-size:13px;color:var(--danger);font-weight:600;"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Invoice</th><th>Client</th><th>Due Date</th><th>Amount</th></tr></thead>
+            <tbody id="overdueTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🏆 Top Clients by Revenue</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Client</th><th>Payments</th><th>Total Income</th></tr></thead>
+            <tbody id="topClientsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/data.js"></script>
+<script src="js/reports.js"></script>
+</body>
+</html>

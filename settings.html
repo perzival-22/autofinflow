@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings | AutoFinFlow</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">A</div>
+    <div class="logo-text">Auto<span>Fin</span>Flow</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">Main</span>
+    <a href="index.html"    class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <a href="payments.html"  class="nav-item"><span class="nav-icon">💳</span> Payments</a>
+    <a href="recurring.html" class="nav-item"><span class="nav-icon">🔁</span> Recurring</a>
+    <a href="reports.html"   class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+    <a href="forecast.html" class="nav-item"><span class="nav-icon">🔮</span> Forecast</a>
+    <span class="nav-section-label">Business</span>
+    <a href="clients.html"  class="nav-item"><span class="nav-icon">👥</span> Clients</a>
+    <span class="nav-section-label">System</span>
+    <a href="settings.html" class="nav-item active"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><div class="version">AutoFinFlow v2.0</div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Settings</h1>
+      <p>Company profile, preferences, and data management</p>
+    </div>
+  </header>
+
+  <div class="page-body" style="max-width:800px;">
+
+    <!-- Company Profile -->
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-header"><span class="card-title">🏢 Company Profile</span></div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Company Name</label>
+            <input class="form-control" id="sCompany" placeholder="Your Business Name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tagline / Description</label>
+            <input class="form-control" id="sTagline" placeholder="e.g. IT Consulting & Solutions" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-control" id="sEmail" type="email" placeholder="billing@yourbusiness.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-control" id="sPhone" placeholder="+254 7XX XXX XXX" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <input class="form-control" id="sAddress" placeholder="Street, City, Country" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Financial Settings -->
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-header"><span class="card-title">💰 Financial Preferences</span></div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Currency</label>
+            <select class="form-control" id="sCurrency">
+              <option value="KES">KES — Kenyan Shilling</option>
+              <option value="USD">USD — US Dollar</option>
+              <option value="EUR">EUR — Euro</option>
+              <option value="GBP">GBP — British Pound</option>
+              <option value="UGX">UGX — Ugandan Shilling</option>
+              <option value="TZS">TZS — Tanzanian Shilling</option>
+              <option value="ZAR">ZAR — South African Rand</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">VAT / Tax Rate (%)</label>
+            <input class="form-control" id="sVat" type="number" min="0" max="100" step="0.1" placeholder="16" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Default Payment Terms (days)</label>
+          <select class="form-control" id="sTerms">
+            <option value="7">Net 7</option>
+            <option value="14">Net 14</option>
+            <option value="30">Net 30</option>
+            <option value="60">Net 60</option>
+            <option value="90">Net 90</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+      </div>
+    </div>
+
+    <!-- Data Management -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">🗄️ Data Management</span></div>
+      <div class="card-body">
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">
+          Export a full backup of your data (invoices, payments, clients, settings) as a JSON file.
+          You can restore this backup at any time.
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+          <button class="btn btn-outline" onclick="DB.exportBackup()">⬇️ Export Backup</button>
+          <label class="btn btn-outline" style="cursor:pointer;">
+            ⬆️ Import Backup
+            <input type="file" accept=".json" style="display:none" onchange="importBackup(this)" />
+          </label>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:20px;">
+          <p style="font-size:13px;color:var(--danger);margin-bottom:12px;font-weight:500;">⚠️ Danger Zone</p>
+          <button class="btn btn-danger btn-sm" onclick="resetData()">Reset All Data</button>
+          <span style="font-size:12px;color:var(--text-muted);margin-left:10px;">Clears all invoices, payments, and clients. Cannot be undone.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/data.js"></script>
+<script src="js/settings.js"></script>
+</body>
+</html>
